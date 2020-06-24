@@ -1,6 +1,7 @@
 const path = require('path')
 const express = require('express')
 const hbs = require('hbs')
+const forcast = require('./utils/forcast')
 
 const app = express()
 
@@ -17,6 +18,28 @@ hbs.registerPartials(partialsPath)
 
 app.get('/', (req, res) => {
     res.render('index')
+})
+
+app.get('/weather', (req, res) => {
+    const { address } = req.query
+    if (!address) {
+        return res.send({
+            error: "Please provide a address."
+        })
+    }
+
+    forcast(address, (error, data) => {
+        if (error) {
+            return res.send({
+                error
+            })
+        }
+
+        res.send({
+            ...data
+        })
+
+    })
 })
 
 app.get('*', (req, res) => {
